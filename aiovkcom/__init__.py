@@ -1,4 +1,4 @@
-from . import api, exceptions, parser, sessions
+from . import api, exceptions, parsers, sessions
 from .exceptions import AuthError, APIError
 from .sessions import TokenSession, ImplicitSession
 from .api import API
