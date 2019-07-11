@@ -74,10 +74,12 @@ class TokenSession(Session):
             status = resp.status
             response = await resp.json(content_type=self.CONTENT_TYPE)
 
-        if status == 200:
+        if 'response' in response:
             response = response['response']
-        else:
+        elif 'error' in response:
             raise APIError(response['error'])
+        else:
+            raise RuntimeError(status)
 
         return response
 
