@@ -89,11 +89,11 @@ class ImplicitSession(TokenSession):
     OAUTH_URL = 'https://oauth.vk.com/authorize'
     REDIRECT_URI = 'https://oauth.vk.com/blank.html'
 
-    __slots__ = ('client_id', 'login', 'passwd', 'scope', 'expires_in')
+    __slots__ = ('app_id', 'login', 'passwd', 'scope', 'expires_in')
 
-    def __init__(self, client_id, login, passwd, scope='', v='', session=None):
+    def __init__(self, app_id, login, passwd, scope='', v='', session=None):
         super().__init__('', v, session)
-        self.client_id = client_id
+        self.app_id = app_id
         self.login = login
         self.passwd = passwd
         self.scope = scope
@@ -105,7 +105,7 @@ class ImplicitSession(TokenSession):
             'display': 'page',
             'response_type': 'token',
             'redirect_uri': self.REDIRECT_URI,
-            'client_id': self.client_id,
+            'client_id': self.app_id,
             'scope': self.scope,
             'v': self.v,
         }
