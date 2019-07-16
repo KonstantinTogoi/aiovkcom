@@ -12,7 +12,7 @@ setup(
     name='aiovkcom',
     version='0.0.1',
     author='Konstantin Togoi',
-    author_email = 'konstantin.togoi@protonmail.com',
+    author_email='konstantin.togoi@protonmail.com',
     url='https://github.com/KonstantinTogoi/aiovkcom',
     description='vk.com Python REST API wrapper',
     long_description=readme,
