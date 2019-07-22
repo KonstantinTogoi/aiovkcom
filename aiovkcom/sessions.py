@@ -161,7 +161,7 @@ class ImplicitSession(TokenSession):
         parser.feed(html)
         parser.close()
 
-        form_url, form_data = parser.url, parser.inputs
+        form_url, form_data = parser.form
         form_data['email'] = self.login
         form_data['pass'] = self.passwd
 
@@ -188,7 +188,7 @@ class ImplicitSession(TokenSession):
         parser.feed(html)
         parser.close()
 
-        form_url, form_data = parser.url, parser.inputs
+        form_url, form_data = parser.form
 
         async with self.session.post(form_url, data=form_data) as resp:
             if resp.status != 200:
