@@ -19,15 +19,22 @@ class OAuthError(Error):
         super().__init__({'error': 'oauth_error', 'error_description': error})
 
 
-class AuthError(Error):
+class CustomOAuthError(Error):
+    """Custom errors that raised when authorization failed."""
 
-    ERROR = {
-        'error': 'invalid_user_credentials',
-        'error_description': 'invalid login or password',
-    }
+    ERROR = {'error': '', 'error_description': ''}
 
     def __init__(self):
         super().__init__(self.ERROR)
+
+
+class InvalidGrantError(CustomOAuthError):
+    """Invalid user credentials."""
+
+    ERROR = {
+        'error': 'invalid_grant',
+        'error_description': 'invalid login or password',
+    }
 
 
 class VKAuthError(Error):

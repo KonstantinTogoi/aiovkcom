@@ -6,7 +6,7 @@ from yarl import URL
 from .exceptions import (
     Error,
     OAuthError,
-    AuthError,
+    InvalidGrantError,
     VKAuthError,
     VKAPIError,
 )
@@ -136,8 +136,8 @@ class ImplicitSession(TokenSession):
                 log.debug(f'giving rights at {url}')
                 url, html = await self._post_access_dialog(html)
             elif url.path == '/authorize' and 'email' in url.query:
-                log.error('Invalid login or password.')
-                raise AuthError()
+                log.error(f'Invalid login "{self.login}" or password.')
+                raise InvalidGrantError()
 
             if url.path == '/blank.html':
                 log.debug('authorized successfully')
