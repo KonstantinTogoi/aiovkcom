@@ -44,6 +44,15 @@ class InvalidGrantError(CustomOAuthError):
     }
 
 
+class InvalidUserError(CustomOAuthError):
+    """Invalid user (blocked)."""
+
+    ERROR = {
+        'error': 'invalid_user',
+        'error_description': 'user is blocked',
+    }
+
+
 class VKAPIError(Error):
     def __init__(self, error: dict):
         super().__init__(error)

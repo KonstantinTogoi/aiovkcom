@@ -6,8 +6,9 @@ from yarl import URL
 from .exceptions import (
     Error,
     OAuthError,
-    InvalidGrantError,
     VKOAuthError,
+    InvalidGrantError,
+    InvalidUserError,
     VKAPIError,
 )
 from .parsers import AuthPageParser, AccessPageParser
@@ -138,6 +139,8 @@ class ImplicitSession(TokenSession):
             elif url.path == '/authorize' and 'email' in url.query:
                 log.error(f'Invalid login "{self.login}" or password.')
                 raise InvalidGrantError()
+            elif url.query.get('act') == 'blocked':
+                raise InvalidUserError()
 
             if url.path == '/blank.html':
                 log.debug('authorized successfully')

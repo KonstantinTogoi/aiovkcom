@@ -4,6 +4,7 @@ from .exceptions import (
     OAuthError,
     VKOAuthError,
     InvalidGrantError,
+    InvalidUserError,
     VKAPIError,
 )
 from .sessions import TokenSession, ImplicitSession
