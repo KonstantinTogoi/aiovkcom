@@ -103,7 +103,7 @@ class ImplicitSession(TokenSession):
     GET_AUTH_DIALOG_ERROR_MSG = 'Failed to open authorization dialog.'
     POST_AUTH_DIALOG_ERROR_MSG = 'Form submission failed.'
     GET_ACCESS_TOKEN_ERROR_MSG = 'Failed to receive access token.'
-    POST_ACCESS_FORM_ERROR_MSG = 'Failed to process access page.'
+    POST_ACCESS_DIALOG_ERROR_MSG = 'Failed to process access dialog.'
 
     __slots__ = ('app_id', 'login', 'passwd', 'scope', 'expires_in')
 
@@ -225,8 +225,8 @@ class ImplicitSession(TokenSession):
 
         async with self.session.post(form_url, data=form_data) as resp:
             if resp.status != 200:
-                log.error(self.POST_ACCESS_FORM_ERROR_MSG)
-                raise OAuthError(self.POST_ACCESS_FORM_ERROR_MSG)
+                log.error(self.POST_ACCESS_DIALOG_ERROR_MSG)
+                raise OAuthError(self.POST_ACCESS_DIALOG_ERROR_MSG)
             else:
                 url, html = resp.url, await resp.text()
 
