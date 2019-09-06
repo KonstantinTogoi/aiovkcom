@@ -19,6 +19,13 @@ class OAuthError(Error):
         super().__init__({'error': 'oauth_error', 'error_description': error})
 
 
+class VKOAuthError(Error):
+    """Invalid client id."""
+
+    def __init__(self, error: dict):
+        super().__init__(error)
+
+
 class CustomOAuthError(Error):
     """Custom errors that raised when authorization failed."""
 
@@ -35,13 +42,6 @@ class InvalidGrantError(CustomOAuthError):
         'error': 'invalid_grant',
         'error_description': 'invalid login or password',
     }
-
-
-class VKAuthError(Error):
-    """Error 401. Invalid 'client_id'."""
-
-    def __init__(self, error: dict):
-        super().__init__(error)
 
 
 class VKAPIError(Error):

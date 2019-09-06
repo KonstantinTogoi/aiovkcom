@@ -7,7 +7,7 @@ from .exceptions import (
     Error,
     OAuthError,
     InvalidGrantError,
-    VKAuthError,
+    VKOAuthError,
     VKAPIError,
 )
 from .parsers import AuthPageParser, AccessPageParser
@@ -156,7 +156,7 @@ class ImplicitSession(TokenSession):
             if resp.status == 401:
                 error = await resp.json(content_type=self.CONTENT_TYPE)
                 log.error(error)
-                raise VKAuthError(error)
+                raise VKOAuthError(error)
             elif resp.status != 200:
                 log.error(self.GET_AUTH_DIALOG_ERROR_MSG)
                 raise OAuthError(self.GET_AUTH_DIALOG_ERROR_MSG)
