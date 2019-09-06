@@ -123,12 +123,12 @@ class ImplicitSession(TokenSession):
             url, html = await self._get_auth_dialog()
 
             if url.path == '/authorize':
-                log.debug(f'authorizing.. at {url}')
+                log.debug(f'authorizing at {url}')
                 url, html = await self._post_auth_dialog(html)
 
             if url.path == '/authorize' and '__q_hash' in url.query:
-                log.debug(f'giving rights.. at {url}')
-                url, html = await self._post_access_form(html)
+                log.debug(f'giving rights at {url}')
+                url, html = await self._post_access_dialog(html)
             elif url.path == '/authorize' and 'email' in url.query:
                 log.error('Invalid login or password.')
                 raise AuthError()
@@ -140,7 +140,7 @@ class ImplicitSession(TokenSession):
 
             await asyncio.sleep(retry_interval)
         else:
-            log.debug('Authorization failed.')
+            log.error('Authorization failed.')
             raise Error('Authorization failed.')
 
     async def _get_auth_dialog(self):
@@ -188,8 +188,8 @@ class ImplicitSession(TokenSession):
 
         return url, html
 
-    async def _post_access_form(self, html):
-        """Clicks button 'allow' in a page with access form.
+    async def _post_access_dialog(self, html):
+        """Clicks button 'allow' in a page with access dialog.
 
         Args:
             html (str): html code of the page with access form.
