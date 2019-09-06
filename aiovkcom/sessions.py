@@ -3,7 +3,13 @@ import asyncio
 import logging
 from yarl import URL
 
-from .exceptions import Error, AuthError, VKAuthError, VKAPIError
+from .exceptions import (
+    Error,
+    OAuthError,
+    AuthError,
+    VKAuthError,
+    VKAPIError,
+)
 from .parsers import AuthPageParser, AccessPageParser
 
 
@@ -153,7 +159,7 @@ class ImplicitSession(TokenSession):
                 raise VKAuthError(error)
             elif resp.status != 200:
                 log.error(self.GET_AUTH_DIALOG_ERROR_MSG)
-                raise Error(self.GET_AUTH_DIALOG_ERROR_MSG)
+                raise OAuthError(self.GET_AUTH_DIALOG_ERROR_MSG)
             else:
                 url, html = resp.url, await resp.text()
 
@@ -182,7 +188,7 @@ class ImplicitSession(TokenSession):
         async with self.session.post(form_url, data=form_data) as resp:
             if resp.status != 200:
                 log.error(self.POST_AUTH_DIALOG_ERROR_MSG)
-                raise Error(self.POST_AUTH_DIALOG_ERROR_MSG)
+                raise OAuthError(self.POST_AUTH_DIALOG_ERROR_MSG)
             else:
                 url, html = resp.url, await resp.text()
 
@@ -209,7 +215,7 @@ class ImplicitSession(TokenSession):
         async with self.session.post(form_url, data=form_data) as resp:
             if resp.status != 200:
                 log.error(self.POST_ACCESS_FORM_ERROR_MSG)
-                raise Error(self.POST_ACCESS_FORM_ERROR_MSG)
+                raise OAuthError(self.POST_ACCESS_FORM_ERROR_MSG)
             else:
                 url, html = resp.url, await resp.text()
 
@@ -219,7 +225,7 @@ class ImplicitSession(TokenSession):
         async with self.session.get(self.OAUTH_URL, params=self.params) as resp:
             if resp.status != 200:
                 log.error(self.GET_ACCESS_TOKEN_ERROR_MSG)
-                raise Error(self.GET_ACCESS_TOKEN_ERROR_MSG)
+                raise OAuthError(self.GET_ACCESS_TOKEN_ERROR_MSG)
             else:
                 location = URL(resp.history[-1].headers['Location'])
                 url = URL(f'?{location.fragment}')
@@ -228,4 +234,4 @@ class ImplicitSession(TokenSession):
             self.access_token = url.query['access_token']
             self.expires_in = url.query['expires_in']
         except KeyError as e:
-            raise Error(f'"{e.args[0]}" is missing in the auth response.')
+            raise OAuthError(f'"{e.args[0]}" is missing in the auth response.')
