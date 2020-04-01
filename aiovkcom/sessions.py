@@ -5,7 +5,6 @@ import logging
 from yarl import URL
 
 from .exceptions import (
-    Error,
     OAuthError,
     InvalidGrantError,
     InvalidUserError,
@@ -22,8 +21,6 @@ class Session:
     """A wrapper around aiohttp.ClientSession."""
 
     CONTENT_TYPE = 'application/json; charset=utf-8'
-
-    __slots__ = ('pass_error', 'session')
 
     def __init__(self, pass_error=False, session=None):
         self.pass_error = pass_error
@@ -48,7 +45,7 @@ class Session:
 class TokenSession(Session):
     """Session for sending authorized requests."""
 
-    URL = 'https://api.vk.com/method/'
+    API_URL = 'https://api.vk.com/method/'
     V = '5.101'
 
     __slots__ = ('access_token', 'v')
@@ -75,7 +72,7 @@ class TokenSession(Session):
 
         """
 
-        url = self.URL + '/' + method_name
+        url = self.API_URL + '/' + method_name
         params = {k: params[k] for k in params if params[k]}
         params.update(self.required_params)
 
