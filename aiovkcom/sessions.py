@@ -1,15 +1,16 @@
 import aiohttp
 import asyncio
 import logging
+
 from yarl import URL
 
 from .exceptions import (
     Error,
     OAuthError,
-    VKOAuthError,
     InvalidGrantError,
     InvalidUserError,
-    VKAPIError,
+    APIError,
+    EmptyResponseError,
 )
 from .parsers import AuthPageParser, AccessPageParser
 
@@ -74,7 +75,7 @@ class TokenSession(Session):
 
         """
 
-        url = f'{self.URL}/{method_name}'
+        url = self.URL + '/' + method_name
         params = {k: params[k] for k in params if params[k]}
         params.update(self.required_params)
 
@@ -84,10 +85,12 @@ class TokenSession(Session):
         if self.pass_error:
             response = content
         elif 'error' in content:
-            log.error(content['error'])
-            raise VKAPIError(content['error'])
-        else:
+            log.error(content)
+            raise APIError(content)
+        elif content:
             response = content['response']
+        else:
+            raise EmptyResponseError()
 
         return response
 
@@ -134,18 +137,18 @@ class ImplicitSession(TokenSession):
         retry_interval = retry_interval or self.AUTHORIZE_RETRY_INTERVAL
 
         for attempt_num in range(num_attempts):
-            log.debug(f'getting authorization dialog {self.OAUTH_URL}')
+            log.debug('getting authorization dialog %s' % self.OAUTH_URL)
             url, html = await self._get_auth_dialog()
 
             if url.path == '/authorize':
-                log.debug(f'authorizing at {url}')
+                log.debug('authorizing at %s' % url)
                 url, html = await self._post_auth_dialog(html)
 
             if url.path == '/authorize' and '__q_hash' in url.query:
-                log.debug(f'giving rights at {url}')
+                log.debug('giving rights at %s' % url)
                 url, html = await self._post_access_dialog(html)
             elif url.path == '/authorize' and 'email' in url.query:
-                log.error(f'Invalid login "{self.login}" or password.')
+                log.error('Invalid login "%s" or password.' % self.login)
                 raise InvalidGrantError()
             elif url.query.get('act') == 'blocked':
                 raise InvalidUserError()
@@ -157,8 +160,8 @@ class ImplicitSession(TokenSession):
 
             await asyncio.sleep(retry_interval)
         else:
-            log.error(f'{num_attempts} login attempts exceeded.')
-            raise OAuthError(f'{num_attempts} login attempts exceeded.')
+            log.error('%d login attempts exceeded.' % num_attempts)
+            raise OAuthError('%d login attempts exceeded.' % num_attempts)
 
     async def _get_auth_dialog(self):
         """Return URL and html code of authorization page."""
@@ -167,7 +170,7 @@ class ImplicitSession(TokenSession):
             if resp.status == 401:
                 error = await resp.json(content_type=self.CONTENT_TYPE)
                 log.error(error)
-                raise VKOAuthError(error)
+                raise OAuthError(error)
             elif resp.status != 200:
                 log.error(self.GET_AUTH_DIALOG_ERROR_MSG)
                 raise OAuthError(self.GET_AUTH_DIALOG_ERROR_MSG)
@@ -239,10 +242,10 @@ class ImplicitSession(TokenSession):
                 raise OAuthError(self.GET_ACCESS_TOKEN_ERROR_MSG)
             else:
                 location = URL(resp.history[-1].headers['Location'])
-                url = URL(f'?{location.fragment}')
+                url = URL('?' + location.fragment)
 
         try:
             self.access_token = url.query['access_token']
             self.expires_in = url.query['expires_in']
         except KeyError as e:
-            raise OAuthError(f'"{e.args[0]}" is missing in the auth response.')
+            raise OAuthError(str(e.args[0]) + ' is missing in response.')
