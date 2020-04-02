@@ -119,7 +119,7 @@ class ImplicitSession(TokenSession):
     def params(self):
         """Authorization parameters."""
         return {
-            'display': 'page',
+            'display': 'mobile',
             'response_type': 'token',
             'redirect_uri': self.REDIRECT_URI,
             'client_id': self.app_id,
