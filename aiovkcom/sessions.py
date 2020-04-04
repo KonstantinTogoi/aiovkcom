@@ -165,26 +165,33 @@ class ImplicitSession(TokenSession):
     GET_ACCESS_TOKEN_ERROR_MSG = 'Failed to receive access token.'
     POST_ACCESS_DIALOG_ERROR_MSG = 'Failed to process access dialog.'
 
-    __slots__ = ('app_id', 'login', 'passwd', 'scope', 'expires_in')
+    __slots__ = ('app_id', 'login', 'passwd', 'scope',
+                 'redirect_uri', 'state', 'revoke', 'expires_in')
 
-    def __init__(self, app_id, login, passwd, scope='', v='',
+    def __init__(self, app_id, login, passwd,
+                 scope='', redirect_uri='', state='', revoke=0, v='',
                  pass_error=False, session=None, **kwargs):
         super().__init__('', v, pass_error, session, **kwargs)
         self.app_id = app_id
         self.login = login
         self.passwd = passwd
         self.scope = scope
+        self.redirect_uri = redirect_uri or self.REDIRECT_URI
+        self.state = state
+        self.revoke = revoke
 
     @property
     def params(self):
-        """Authorization parameters."""
+        """Authorization request's parameters."""
         return {
-            'display': 'mobile',
-            'response_type': 'token',
-            'redirect_uri': self.REDIRECT_URI,
             'client_id': self.app_id,
+            'redirect_uri': self.redirect_uri,
+            'display': 'mobile',
             'scope': self.scope,
+            'response_type': 'token',
             'v': self.v,
+            'state': self.state,
+            'revoke': self.revoke,
         }
 
     async def authorize(self, num_attempts=None, retry_interval=None):
