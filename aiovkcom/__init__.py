@@ -7,5 +7,11 @@ from .exceptions import (
     APIError,
     EmptyResponseError,
 )
-from .sessions import TokenSession, ImplicitSession
+from .sessions import (
+    TokenSession,
+    CodeSession,
+    ImplicitSession,
+)
 from .api import API
+
+__version__ = '0.0.5'

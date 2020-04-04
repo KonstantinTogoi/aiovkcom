@@ -50,7 +50,8 @@ class TokenSession(Session):
 
     __slots__ = ('access_token', 'v')
 
-    def __init__(self, access_token, v='', pass_error=False, session=None):
+    def __init__(self, access_token, v='',
+                 pass_error=False, session=None, **kwargs):
         super().__init__(pass_error, session)
         self.access_token = access_token
         self.v = v or self.V
@@ -92,6 +93,65 @@ class TokenSession(Session):
         return response
 
 
+class CodeSession(TokenSession):
+    """Session with authorization with OAuth 2.0 (Authorization Code Grant).
+
+    The Authorization Code grant is used by confidential and public
+    clients to exchange an authorization code for an access token.
+
+    .. _OAuth 2.0 Authorization Code Grant
+        https://oauth.net/2/grant-types/authorization-code/
+
+    .. _Получение access_token
+        https://vk.com/dev/authcode_flow_user?f=4.%20Получение%20access_token
+
+    """
+
+    OAUTH_URL = 'https://oauth.vk.com/access_token'
+    GET_ACCESS_TOKEN_ERROR_MSG = 'Failed to receive access token.'
+
+    __slots__ = ('app_id', 'code', 'redirect_uri', 'expires_in', 'user_id')
+
+    def __init__(self, app_id, app_secret, code, redirect_uri, v='',
+                 pass_error=False, session=None, **kwargs):
+        super().__init__('', v, pass_error, session, **kwargs)
+        self.app_id = app_id
+        self.app_secret = app_secret
+        self.code = code
+        self.redirect_uri = redirect_uri
+
+    @property
+    def params(self):
+        """Authorization request's parameters."""
+        return {
+            'client_id': self.app_id,
+            'client_secret': self.app_secret,
+            'redirect_uri': self.redirect_uri,
+            'code': self.code,
+        }
+
+    async def authorize(self):
+        """Authorize with OAuth 2.0 (Authorization Code)."""
+
+        async with self.session.get(self.OAUTH_URL, params=self.params) as resp:
+            content = await resp.json(content_type=self.CONTENT_TYPE)
+
+        if 'error' in content:
+            log.error(content)
+            raise OAuthError(content)
+        elif content:
+            try:
+                self.access_token = content['access_token']
+                self.expires_in = content['expires_in']
+                self.user_id = content.get('user_id')
+            except KeyError as e:
+                raise OAuthError('%r is missing in the response' % e.args[0])
+        else:
+            raise OAuthError('got empty authorization response')
+
+        return self
+
+
 class ImplicitSession(TokenSession):
 
     OAUTH_URL = 'https://oauth.vk.com/authorize'
@@ -108,8 +168,8 @@ class ImplicitSession(TokenSession):
     __slots__ = ('app_id', 'login', 'passwd', 'scope', 'expires_in')
 
     def __init__(self, app_id, login, passwd, scope='', v='',
-                 pass_error=False, session=None):
-        super().__init__('', v, pass_error, session)
+                 pass_error=False, session=None, **kwargs):
+        super().__init__('', v, pass_error, session, **kwargs)
         self.app_id = app_id
         self.login = login
         self.passwd = passwd
@@ -245,4 +305,4 @@ class ImplicitSession(TokenSession):
             self.access_token = url.query['access_token']
             self.expires_in = url.query['expires_in']
         except KeyError as e:
-            raise OAuthError(str(e.args[0]) + ' is missing in response.')
+            raise OAuthError('%r is missing in response.' % e.args[0])
