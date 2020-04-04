@@ -1,11 +1,4 @@
-from os.path import dirname, join
 from setuptools import find_packages, setup
-
-
-readme_path = join(dirname(__file__), 'README.md')
-
-with open(readme_path, encoding='utf-8') as readme_file:
-    readme = readme_file.read()
 
 
 setup(
@@ -15,8 +8,7 @@ setup(
     author_email='konstantin.togoi@protonmail.com',
     url='https://github.com/KonstantinTogoi/aiovkcom',
     description='vk.com Python REST API wrapper',
-    long_description=readme,
-    long_description_content_type='text/markdown',
+    long_description=open('README.rst').read(),
     license='BSD',
     packages=find_packages(),
     python_requires='>=3.5',
