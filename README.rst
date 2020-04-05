@@ -7,7 +7,7 @@
 .. image:: https://img.shields.io/pypi/pyversions/aiovkcom.svg
     :target: https://pypi.python.org/pypi/aiovkcom
 
-.. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
+.. image:: https://readthedocs.org/projects/aiovkcom/badge/?version=latest
     :target: https://aiovkcom.readthedocs.io/en/latest/
 
 .. image:: https://travis-ci.com/KonstantinTogoi/aiovkcom.svg
