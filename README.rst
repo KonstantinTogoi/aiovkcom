@@ -18,7 +18,7 @@
 aiovkcom
 ========
 
-aiovkcom is a `vk.com <https://vk.com>`_ python API wrapper.
+aiovkcom is a python `vk.com API <https://vk.com/dev/api_requests>`_ wrapper.
 The main features are:
 
 * authorization (`Authorization Code <https://oauth.net/2/grant-types/authorization-code/>`_, `Implicit Flow <https://oauth.net/2/grant-types/implicit/>`_)
@@ -27,8 +27,8 @@ The main features are:
 Usage
 -----
 
-To use REST API you need a registered app
-and `vk.com <https://vk.com>`_ account.
+To use `vk.com API <https://vk.com/dev/api_requests>`_ you need
+a registered app and `vk.com <https://vk.com>`_ account.
 For more details, see
 `aiovkcom Documentation <https://aiovkcom.readthedocs.io/>`_.
 
