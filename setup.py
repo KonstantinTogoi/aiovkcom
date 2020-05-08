@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='aiovkcom',
-    version='0.1.0.post1',
+    version='0.1.0.post2',
     author='Konstantin Togoi',
     author_email='konstantin.togoi@protonmail.com',
     url='https://github.com/KonstantinTogoi/aiovkcom',
